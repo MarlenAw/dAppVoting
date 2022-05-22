@@ -3,7 +3,7 @@
 
 pragma solidity ^0.8.7;
 
-contract marketsentiment{
+contract MarketSentiment{
     address public owner; 
     string[] public tickersArray;
 
