@@ -34,4 +34,25 @@ contract marketsentiment{
         newTicker.exists = true;
         tickersArray.push(_ticker);
     }
+
+    function vote(string memory _ticker, bool _vote) public{
+        require(Tickers[_ticker].exists, "Can't vote on this coin");
+        require(!Tickers[_ticker].Voters[msg.sender], 'You have already voted for this coin');
+
+        ticker storage t = Tickers[_ticker];
+        t.Voters[msg.sender] = true;
+
+        _vote ? t.up++ : t.down++;
+
+        emit tickerupdated(t.up, t.down, msg.sender, _ticker);
+    }
+
+    function getVotes(string memory _ticker) public view returns (
+        uint256 up,
+        uint256 down
+    ){
+        require(Tickers[_ticker].exists, "No such Ticker defined!");
+        ticker storage t = Tickers[_ticker];
+        return(t.up, t.down);
+    }
 }
