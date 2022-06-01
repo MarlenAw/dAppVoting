@@ -1,9 +1,13 @@
 import React, { useEffect, useState } from "react";
 import "./App.css";
 import { ConnectButton } from "web3uikit";
-import logo from "./images/Moralis.png"
+import logo from "./images/Moralis.png";
+import Coin from "./components/Coin";
 
 const App = () => {
+
+  const [btc, setBtc] = useState(38);
+
 
   return (
     <>
@@ -17,6 +21,13 @@ const App = () => {
 
       <div className="instructions">
         Where do you think these tokens are going? Up or Down?
+      </div>
+      <div className="list">
+        <Coin 
+          perc={btc}
+          setPerc={setBtc}
+          token={"BTC"}
+        />
       </div>
     </>
   );
