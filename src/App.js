@@ -4,7 +4,7 @@ import { ConnectButton, Modal } from "web3uikit";
 import logo from "./images/Moralis.png";
 import Coin from "./components/Coin";
 import {abouts} from "./about";
-import { useMoralisWeb3Api } from "react-moralis";
+import { useMoralisWeb3Api, useMoralis } from "react-moralis";
 
 const App = () => {
 
@@ -15,6 +15,53 @@ const App = () => {
   const [modalToken, setModalToken] = useState();
   const [modalPrice, setModalPrice] = useState();
   const Web3Api = useMoralisWeb3Api();
+  const {Moralis, isInitialized} = useMoralis();
+
+  async function getRatio(tick, setPerc){
+    const Votes = Moralis.Object.extend("Votes");
+    const query = new Moralis.Query(Votes);
+
+    query.equalTo("ticker", tick);
+    query.descending("createdAt");
+    const results = await query.first();
+
+    let up = Number(results.attributes.up);
+    let down = Number(results.attributes.down);
+
+    let ratio = Math.round(up/(up+down)*100);
+
+    setPerc(ratio);
+  }
+
+  useEffect(() => {
+    if(isInitialized){
+    getRatio("BTC", setBtc);
+    getRatio("ETH", setEth);
+    getRatio("LINK", setLink);
+
+
+
+    async function createLiveQuery(){
+      let query = new Moralis.Query('Votes');
+      let subscription = await query.subscribe();
+      subscription.on('update', (object) => {
+        
+        if(object.attributes.ticker === "LINK"){
+          getRatio("LINK", setLink);
+        }else if(object.attributes.ticker === "ETH"){
+          getRatio("ETH", setEth);
+        }else if(object.attributes.ticker === "BTC"){
+          getRatio("BTC", setBtc);
+        }
+
+      });
+    }
+
+
+    createLiveQuery();
+    }
+
+  }, [isInitialized]);
 
   useEffect(()=>{
     async function fetchTokenPrice(){
